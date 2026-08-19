@@ -63,11 +63,50 @@ One engine, four valves — the same deterministic fact-card engine pointed at:
 
 1. **Models**
 2. **Datasets** (this pilot)
-3. **Benchmarks**
-4. **Leaderboards**
+3. **Benchmarks** — **LIVE** (valve 2, `bench_carder.py`)
+4. **Leaderboards** — **LIVE** (valve 2, `bench_carder.py`)
 
 Each valve opens under the same etiquette law: own artifacts first, third parties opt-in
 with right-of-reply, never unsolicited public verdicts.
+
+## Valve 2: benchmarks and leaderboards (`bench_carder.py`)
+
+Live, and pointed at CSOAI's **own** benchmark/leaderboard artifacts only — the same
+own-artifacts-first sequence as the dataset pilot. Third parties remain opt-in with
+right-of-reply; there are no unsolicited public verdicts.
+
+No quality opinions — facts with dates. Every check records what was fetched, from which
+URL, with which HTTP status, by which method, on which date.
+
+The deterministic check-set (from the meta-measurement ruling):
+
+- **methodology_published** — does the stated methodology URL return 200 (URL + status recorded)
+- **statistical_reporting** — are the stated CI / n / separation field names present in the
+  board payload JSON (each field Y/N, names recorded)
+- **contamination_policy** — does the stated sealed held-out bank manifest exist, and does it
+  carry its sha256 field (the manifest's existence and sha256 are the fact)
+- **versioning_changelog** — does the stated changelog/feed URL return 200, or is the artifact
+  a git repository (commit history as the version record)
+- **license** — SPDX licence fact gated against the same green list as `carder.py`
+  (GREEN / RED_REVIEW; RED_REVIEW means a human must review the licence fact)
+- **submission_rules_published** — does the stated submission-rules URL return 200
+- **variant_disclosure** — does the stated variant-disclosure policy URL return 200
+- **refresh_recency** — date of last update, from the Last-Modified header, a payload date
+  field, the repository's public commits Atom feed, or a repository API field
+
+Every check lands in one of the three data states. A network failure is UNMEASURED with the
+reason stated; an HTTP 404 is a MEASURED "N". Cards use the same envelope as the dataset
+carder (canonical JSON, self-excluding `content_id`, honest-unsigned pod note, ≤3KB) and
+pass the adjective lint plus a bench term lint before anything is written.
+
+```bash
+python3 bench_carder.py --generated-at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    --targets targets/own.json --out cards-bench
+```
+
+Targets live in `targets/own.json` (currently the gspc-board leaderboard, the
+codabench-gspc competition repo, and this carder repo). Cards land in
+`cards-bench/<name>.bench-card.json`.
 
 ## Run
 
@@ -82,14 +121,16 @@ CPU-only; stdlib + `requests`.
 ## Tests
 
 ```bash
-python3 -m pytest tests/test_carder.py
+python3 -m pytest tests/test_carder.py tests/test_bench_carder.py
 # or without pytest:
 python3 tests/test_carder.py
+python3 tests/test_bench_carder.py
 ```
 
 Acceptance: the adjective lint rejects a poisoned card; canonical JSON round-trips to a
 stable sha256; a missing licence yields RED_REVIEW, not a crash; unsigned cards always
-carry `signing_status`.
+carry `signing_status`. Bench valve: an unfetchable check comes back UNMEASURED, not a
+crash; the lints refuse poisoned bench cards; the `content_id` envelope round-trips.
 
 ## Contact
 

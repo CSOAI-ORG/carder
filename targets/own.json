@@ -1,0 +1,109 @@
+{
+  "schema": "csoai.bench-targets/0.1",
+  "scope": "CSOAI's own benchmark/leaderboard artifacts only (zero-permission pilot)",
+  "targets": [
+    {
+      "name": "gspc-board",
+      "artifact_type": "leaderboard",
+      "checks": {
+        "methodology": {
+          "url": "https://councilof.ai/methodology"
+        },
+        "statistical_reporting": {
+          "payload_url": "https://councilof.ai/api/gspc",
+          "ci_field": "interval",
+          "n_field": "n",
+          "separation_field": "separation"
+        },
+        "contamination_policy": {
+          "reason": "no contamination-policy URL published on the board itself; the sealed held-out bank manifest lives in the codabench-gspc repository, carded separately"
+        },
+        "versioning_changelog": {
+          "url": "https://councilof.ai/api/feed.xml"
+        },
+        "license": {
+          "payload_url": "https://councilof.ai/api/gspc",
+          "payload_fields": [
+            "license",
+            "licence",
+            "spdx"
+          ]
+        },
+        "submission_rules": {
+          "reason": "the board is read-only; no public submission route is published as of the card date"
+        },
+        "variant_disclosure": {
+          "reason": "no variant-disclosure policy URL published for this artifact as of the card date"
+        },
+        "refresh_recency": {
+          "payload_url": "https://councilof.ai/api/gspc",
+          "date_fields": [
+            "updated",
+            "date"
+          ]
+        }
+      }
+    },
+    {
+      "name": "codabench-gspc",
+      "artifact_type": "benchmark",
+      "checks": {
+        "methodology": {
+          "url": "https://raw.githubusercontent.com/CSOAI-ORG/codabench-gspc/main/pages/overview.md"
+        },
+        "statistical_reporting": {
+          "reason": "competition repository publishes no leaderboard payload URL; the CI/n field check runs on board payloads only"
+        },
+        "contamination_policy": {
+          "url": "https://raw.githubusercontent.com/CSOAI-ORG/codabench-gspc/main/reference_data/HELDOUT_SEAL.json",
+          "sha256_field": "sha256"
+        },
+        "versioning_changelog": {
+          "git_repo_url": "https://github.com/CSOAI-ORG/codabench-gspc"
+        },
+        "license": {
+          "license_file_url": "https://raw.githubusercontent.com/CSOAI-ORG/codabench-gspc/main/LICENSE"
+        },
+        "submission_rules": {
+          "url": "https://raw.githubusercontent.com/CSOAI-ORG/codabench-gspc/main/competition.yaml"
+        },
+        "variant_disclosure": {
+          "reason": "no variant-disclosure policy URL published for this artifact as of the card date"
+        },
+        "refresh_recency": {
+          "commits_atom_url": "https://github.com/CSOAI-ORG/codabench-gspc/commits/main.atom"
+        }
+      }
+    },
+    {
+      "name": "carder",
+      "artifact_type": "benchmark-tooling",
+      "checks": {
+        "methodology": {
+          "url": "https://raw.githubusercontent.com/CSOAI-ORG/carder/main/README.md"
+        },
+        "statistical_reporting": {
+          "reason": "tool repository publishes no leaderboard payload; the CI/n field check runs on board payloads only"
+        },
+        "contamination_policy": {
+          "reason": "tool repository hosts no evaluation data; no contamination-policy URL stated"
+        },
+        "versioning_changelog": {
+          "git_repo_url": "https://github.com/CSOAI-ORG/carder"
+        },
+        "license": {
+          "license_file_url": "https://raw.githubusercontent.com/CSOAI-ORG/carder/main/LICENSE"
+        },
+        "submission_rules": {
+          "reason": "tool repository accepts no benchmark submissions; no submission-rules URL stated"
+        },
+        "variant_disclosure": {
+          "reason": "no variant-disclosure policy URL published for this artifact as of the card date"
+        },
+        "refresh_recency": {
+          "commits_atom_url": "https://github.com/CSOAI-ORG/carder/commits/main.atom"
+        }
+      }
+    }
+  ]
+}
