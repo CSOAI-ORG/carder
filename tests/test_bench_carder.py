@@ -92,6 +92,8 @@ def test_lint_rejects_opinion_words_and_banned_terms_on_bench_cards():
     base = {
         "schema": bench_carder.SCHEMA,
         "target_id": "poisoned-example",
+        "scope": "own-artifacts pilot; benchmark/leaderboard valve; "
+                 "measurement only, facts with dates",
         "signature": None,
         "signing_status": carder.SIGNING_STATUS_UNSIGNED,
     }

@@ -32,6 +32,8 @@ import sys
 
 import requests
 
+import reply_pipeline
+
 HF_API = "https://huggingface.co/api/datasets"
 USER_AGENT = "csoai-carder/0.1 (nicholas@csoai.org; CSOAI Ltd, UK Companies House 16939677)"
 
@@ -275,8 +277,13 @@ def build_card(dataset_id, meta, generated_at):
 
 
 def write_card(card, out_dir):
-    """Lint, then write canonical JSON. Refuses to write if lint fails."""
+    """Lint and gate, then write canonical JSON. Refuses to write if either fails.
+
+    The right-of-reply gate is structural: a card whose scope is not "own"
+    cannot produce a file unless a right-of-reply token has been issued, its
+    notice sent, and a reply received or the window closed."""
     adjective_lint(card)  # raises AdjectiveLintError; nothing is written
+    reply_pipeline.check_gate(card)  # raises GateError; nothing is written
     name = card["dataset_id"].split("/", 1)[-1]
     path = os.path.join(out_dir, name + ".card.json")
     data = canonical_bytes(card)

@@ -14,6 +14,47 @@ This v0.1 is the ruled pilot: it runs on CSOAI's **own** public datasets only
 
 > own datasets first; third parties opt-in with right-of-reply; never unsolicited public verdicts
 
+## Right of reply — the gate that unlocks names
+
+Own artifacts card freely. The moment a card names a **third party**, a gate
+stands in the way, and it is structural, not conventional: `write_card` and
+`write_bench_card` call `check_gate` before writing, so a third-party target
+without a valid right-of-reply record **cannot produce a card file** — a hard
+fail, per the meta-measurement ruling's acceptance test.
+
+**The law.** Sequence: own → opt-in → unsolicited-with-reply, and the last step
+opens only after this pipeline is proven. Etiquette: the measured party is
+notified privately first; a reply window of **10 business days** (weekends
+skipped, calendar honest) runs from the moment the token is issued; corrections
+are appended, never edited.
+
+**The flow** (`reply_pipeline.py`):
+
+1. **issue** — `issue_token(target_id, card_content_id, issued_at)` returns a
+   deterministic token = `sha256(canonical({target_id, card_content_id,
+   issued_at}))[:32]` and appends a ledger record to `reply_ledger.jsonl`
+   (`notice_status: DRAFTED`, `reply_status: PENDING`, `window_closes` computed
+   10 business days out).
+2. **notice DRAFTED** — `render_notice(token, card)` writes `notices/<token>.md`:
+   what we measured (facts and dates only), the full card JSON verbatim, the
+   window close date, how to reply (nicholas@csoai.org), and the standing
+   commitments. The file header states it is **DRAFTED ONLY**.
+3. **owner sends** — sending is a human/owner action, never done by the program.
+   The owner records it with `mark_notice_sent(token, sent_at)`
+   (`notice_status → SENT`).
+4. **reply or window** — `record_reply(token, reply_text, received_at)` appends
+   the reply verbatim (corrections accumulate, never overwrite); or the reply
+   window closes with no reply.
+5. **publish with reply attached** — `check_gate` passes only when the ledger
+   holds a record whose `card_content_id` matches, `notice_status == SENT`, and
+   a reply was received **or** the window has closed. Any card published this
+   way must carry `reply_summary` + a link to the reply.
+
+Standing commitments in every notice: verification is free; corrections are
+appended, never edited; this is measurement, not a mark of approval or
+endorsement; and no money moves in either direction between us and any measured
+party. Notices are linted so no banned word ever reaches the page.
+
 ## Three data states
 
 Every fact in a card is in exactly one state:

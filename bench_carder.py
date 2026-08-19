@@ -47,6 +47,7 @@ import sys
 import requests
 
 import carder
+import reply_pipeline
 from carder import AdjectiveLintError, canonical_bytes, content_id  # noqa: F401
 
 SCHEMA = "csoai.benchmark.fact-card/0.1"
@@ -472,8 +473,12 @@ def build_bench_card(target, generated_at):
 
 
 def write_bench_card(card, out_dir):
-    """Lint (adjectives + banned terms), then write canonical JSON."""
+    """Lint (adjectives + banned terms) and gate, then write canonical JSON.
+
+    The right-of-reply gate is structural: a bench card whose scope is not
+    "own" cannot produce a file without a valid right-of-reply ledger record."""
     bench_lint(card)  # raises AdjectiveLintError; nothing is written
+    reply_pipeline.check_gate(card)  # raises GateError; nothing is written
     path = os.path.join(out_dir, card["target_id"] + ".bench-card.json")
     data = canonical_bytes(card)
     if len(data) > 3072:
